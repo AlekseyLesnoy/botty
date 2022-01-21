@@ -53,10 +53,11 @@ class Trav:
         picked_up_items = self._pickit.pick_up_items(self._char, is_at_trav=True)
         wait(0.2, 0.3)
         # If we can teleport we want to move back inside and also check loot there
-        if self._char.can_teleport():
+        if self._char.can_teleport() or self._char.can_teleport_with_charges():
             if not self._pather.traverse_nodes([229], self._char, time_out=2.5):
                 self._pather.traverse_nodes([228, 229], self._char, time_out=2.5)
             picked_up_items |= self._pickit.pick_up_items(self._char, is_at_trav=True)
         # Make sure we go back to the center to not hide the tp
-        self._pather.traverse_nodes([230], self._char, time_out=2.5)
+        # if self._template_finder.search_and_wait(["TRAV_19"], threshold=0.65, time_out=5).valid:
+        #    self._pather.traverse_nodes([230], self._char, time_out=2.5)
         return (Location.A3_TRAV_CENTER_STAIRS, picked_up_items)

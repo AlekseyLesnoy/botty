@@ -222,6 +222,9 @@ class Bot:
             else:
                 Logger.error("Failed to detect if /nopickup command was applied or not")
         self.trigger_or_stop("maintenance")
+    
+    def need_refill_teleport_charges(self) -> bool:    
+        return not self._char.select_tp() or self._char.is_low_on_teleport_charges()
 
     def on_maintenance(self):
         # Handle picking up corpse in case of death
@@ -279,9 +282,11 @@ class Bot:
             wait(1.0)
 
         # Check if we are out of tps or need repairing
+        need_refill_teleport = self.need_refill_teleport_charges()
         need_repair = self._ui_manager.repair_needed()
-        if self._tps_left < random.randint(3, 5) or need_repair or self._config.char["always_repair"]:
+        if self._tps_left < random.randint(3, 5) or need_repair or self._config.char["always_repair"] or need_refill_teleport:
             if need_repair: Logger.info("Repair needed. Gear is about to break")
+            if need_refill_teleport: Logger.info("Teleport charges ran out. Need to repair")
             else: Logger.info("Repairing and buying TPs at next Vendor")
             self._curr_loc = self._town_manager.repair_and_fill_tps(self._curr_loc)
             if not self._curr_loc:
